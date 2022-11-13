@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{9c80691a-6166-41ee-bd04-414b4d1d1713}</ProjectGuid>
+    <RootNamespace>BUILDInjectHelper</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+	<PlatformToolset>v143</PlatformToolset>
+	<TargetName>inject_helper</TargetName>
+	<IntermediateOutputPath>$(IntermediateOutputPath)build_inject_helper\</IntermediateOutputPath>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  
+  <PropertyGroup>
+    <BuildDependsOn>
+        $(BuildDependsOn);
+        MyCustomBuildInjectHelper
+    </BuildDependsOn>
+	<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+  
+  
+  <Target Name="MyCustomBuildInjectHelper" Inputs="$(MSBuildProjectDirectory)\..\inject_helper\inject_helper.cpp" Outputs="$(OutDir)$(TargetName)32.exe;$(OutDir)$(TargetName)64.exe">
+    <Message Text="@(SourceFiles);@(HeaderFiles)" />
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\inject_helper\inject_helper.vcxproj" Properties="Platform=Win32;PlatFormTarget=x86;OutDir=$(OutDir)build_inject_helper\x32\;TargetName=$(TargetName)32" RunEachTargetSeparately="true" />
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\inject_helper\inject_helper.vcxproj" Properties="Platform=x64;PlatFormTarget=x64;OutDir=$(OutDir)build_inject_helper\x64\;TargetName=$(TargetName)64" RunEachTargetSeparately="true" />
+	<Copy SourceFiles="$(OutDir)build_inject_helper\x32\$(TargetName)32.exe;$(OutDir)build_inject_helper\x64\$(TargetName)64.exe" DestinationFolder="$(OutDir)" />
+	<RemoveDir Directories="$(OutDir)build_inject_helper\" />
+  </Target>
+  <Target Name="Clean">
+	<Delete Files="$(OutDir)$(TargetName)32.exe;$(OutDir)$(TargetName)64.exe" />
+  </Target>
+</Project>
